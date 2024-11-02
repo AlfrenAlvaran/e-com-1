@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const multer = require("multer"); // Import multer
 const path = require("path"); // Import path module
+const { log } = require("console");
 
 const app = express();
 const PORT = 3000;
@@ -28,8 +29,8 @@ const upload = multer({ storage: storage });
 // MongoDB connection URI
 // const uri =
 //   "mongodb+srv://johnruzell123:ruzellrivera03@mernapp.r3ftv8a.mongodb.net/?retryWrites=true&w=majority&appName=mernapp";
-  const uri = 'mongodb+srv://alfren667:chen050221@cluster0.t69rl.mongodb.net/'
-
+// const uri = "mongodb+srv://alfren667:chen050221@cluster0.t69rl.mongodb.net/";
+const uri = 'mongodb+srv://alfren667:chen050221@cluster0.t69rl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 // Connect to MongoDB
 mongoose
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -49,7 +50,7 @@ const User = mongoose.model(
 );
 
 // Product model
- const Product = mongoose.model(
+const Product = mongoose.model(
   "Product",
   new mongoose.Schema({
     title: String,
@@ -74,7 +75,6 @@ const User = mongoose.model(
     ],
     reviews: [
       {
-        // Added reviews field to store reviews
         text: String,
         rating: Number,
         createdAt: { type: Date, default: Date.now },
@@ -88,6 +88,7 @@ app.post("/api/register", async (req, res) => {
   try {
     const { firstname, lastname, email, password, userType } = req.body;
 
+    console, log(req.body);
     // Input validation
     if (!firstname || !lastname || !email || !password || !userType) {
       return res.status(400).send({ message: "All fields are required" });
@@ -202,7 +203,7 @@ app.get("/api/products/search", async (req, res) => {
     const products = await Product.find({
       $or: [
         { title: { $regex: query, $options: "i" } },
-        { description: { $regex: query, $options: "i" } }, 
+        { description: { $regex: query, $options: "i" } },
       ],
     });
     res.send(products);
@@ -217,9 +218,24 @@ app.post("/api/comments/:productId", async (req, res) => {
   try {
     const { text } = req.body;
     const productId = req.params.productId;
-    console.log(text)
 
-    // Input validation
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res.status(403).send({ message: "No token provided" });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return res
+          .status(403)
+          .send({ message: "Failed to authenticate token" });
+      }
+
+      req.user = decoded;
+    });
+    console.log(text);
+
     if (!text) {
       return res.status(400).send({ message: "Comment text is required" });
     }
@@ -238,7 +254,7 @@ app.post("/api/comments/:productId", async (req, res) => {
   }
 });
 
-// Get comments for a product
+
 app.get("/api/comments/:productId", async (req, res) => {
   try {
     const productId = req.params.productId;
@@ -260,22 +276,24 @@ app.post("/api/messages/:productId", async (req, res) => {
   try {
     const { text } = req.body;
     const productId = req.params.productId;
-    console.log(req.params.productId)
-    console.log(req.body)
+    console.log(req.params.productId);
+    console.log(req.body);
 
-    const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token format
+    const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
       return res.status(403).send({ message: "No token provided" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded)=> {
-      if(err){
-        return res.status(403).send({ message: "Failed to authenticate token" });
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return res
+          .status(403)
+          .send({ message: "Failed to authenticate token" });
       }
 
       req.user = decoded;
-    })
+    });
     // Input validation
     if (!text) {
       return res.status(400).send({ message: "Message text is required" });
@@ -299,7 +317,6 @@ app.post("/api/messages/:productId", async (req, res) => {
 app.get("/api/messages/:productId", async (req, res) => {
   try {
     const productId = req.params.productId;
-   
 
     const product = await Product.findById(productId);
     if (!product) {
@@ -364,9 +381,6 @@ app.post("/api/process-payment", async (req, res) => {
         .status(400)
         .send({ message: "Payment method and amount are required" });
     }
-
-    // Here you would integrate with the payment gateway API
-    // For demonstration, we will just simulate a successful payment
     return res.status(200).json({
       message: "Payment processed successfully",
       paymentMethod,

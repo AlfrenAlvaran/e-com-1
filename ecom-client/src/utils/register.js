@@ -7,7 +7,7 @@ export const register = async (firstname, lastname, email, password, userType) =
     lastname: lastname,
     email: email,
     password: password,
-    userType: userType
+    userType : userType 
   };
 
   try {
@@ -19,6 +19,7 @@ export const register = async (firstname, lastname, email, password, userType) =
 
     // Assuming the response contains user type after registration
     const { userType } = response.data; // Adjust based on your API response
+    return response.data
 
     // Store user information in local storage
     authLogin(email, userType); // Call the auth utility to store user info
