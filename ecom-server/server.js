@@ -175,6 +175,18 @@ app.post("/api/products", async (req, res) => {
     res.status(500).send({ message: "Error creating product" });
   }
 });
+
+
+app.post('/api/delete', async (req, res) => {
+  const { _id } = req.body
+  console.log(req.body)
+  const response = await Product.findByIdAndDelete(_id)
+
+  if(response) {
+    res.status(200).json({ error: false, message: 'Product removed.' });
+  }
+  
+})
 // Upload file endpoint
 app.post("/api/upload", upload.single("file"), async (req, res) => {
   try {

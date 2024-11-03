@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { login as authLogin } from './auth'; // Import the login function from auth.js
+import { login as authLogin } from './auth'; 
 
 export const register = async (firstname, lastname, email, password, userType) => {
   const params = {

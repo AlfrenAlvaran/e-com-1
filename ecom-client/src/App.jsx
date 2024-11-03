@@ -8,8 +8,10 @@ import Register from './components/Register';
 import About from './components/About';
 import MarketplaceDashboard from './components/MarketplaceDashboard'; // Import the MarketplaceDashboard
 import Checkout from './components/Checkout'; // Import the Checkout component
+import Products from './components/Products';
 
 export default function App() {
+  const url = 'http://localhost:3000/'
   return (
     <Router>
       <Routes>
@@ -20,6 +22,7 @@ export default function App() {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/marketplace-dashboard" element={<MarketplaceDashboard />} /> {/* Route for MarketplaceDashboard */}
         <Route path="/checkout" element={<Checkout />} /> {/* Route for Checkout */}
+        <Route path='/products' element={<Products url={url} />} />
         {/* ADD OTHER COMPONENTS HERE */}
       </Routes>
     </Router>

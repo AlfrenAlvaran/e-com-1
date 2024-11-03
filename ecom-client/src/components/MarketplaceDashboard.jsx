@@ -475,9 +475,6 @@ const MarketplaceDashboard = () => {
 
                     </ul>
 
-                    {
-
-                    }
                     <p>Average Rating: {getAverageRating(post.reviews)}</p>
 
                     <form onSubmit={(e) => handleReviewSubmit(post._id, e)}>
